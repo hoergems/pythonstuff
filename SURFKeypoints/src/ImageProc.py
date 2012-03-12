@@ -4,6 +4,7 @@ Created on 23.01.2012
 @author: Marcus
 '''
 import math
+from math import pi
 import cv
 import os
 import collections
@@ -146,30 +147,8 @@ class ImageProc:
                 p = (255.0 / float(max-min)) * image[i, j] - (255.0 / (max-min)) * min
                 p = int(p)                
                 result[i, j] = p
-        return result        
+        return result            
     transform = staticmethod(transformImp)
-    
-    def transformToRangeImp(image, lowerBound, upperBound):
-        result = cv.CreateImage(cv.GetSize(image), 8, 1)
-        (min, max) = ImageProc.findMinMax(image)
-        for i in range(0, image.height):
-            for j in range(0, image.width):
-                p = ((upperBound - lowerBound) / (max - min)) * image[i, j] + lowerBound - ((upperBound - lowerBound) / (max - min)) * min
-                p = int(p)
-                result[i, j] = p
-        return result
-    transformToRange = staticmethod(transformToRangeImp)
-    
-    def ditherImp(image, ditherMatrix):
-        result = cv.CreateImage(cv.GetSize(image), 8, 1)
-        for i in range(0, image.height - len(ditherMatrix)):
-            for j in range(0, image.width - len(ditherMatrix[0])):
-                if (image[i, j] < ditherMatrix[i % 2][j % 2]):
-                    result[i, j] = 0
-                else:
-                    result[i, j] = 255                
-        return result
-    dither = staticmethod(ditherImp)
     
     def getCannyImp(images):
         if isinstance(images, collections.Iterable):
@@ -220,7 +199,64 @@ class ImageProc:
                 if (image[i, j] < min):
                     min = image[i, j]
         return (min, max)  
-    findMinMax = staticmethod(findMinMaxImp)        
+    findMinMax = staticmethod(findMinMaxImp)  
+    
+    def saveImageImp(image, filename):
+        cv.SaveImage(filename + ".jpg", image)
+    saveImage = staticmethod(saveImageImp) 
+    
+    def buildPartialStacksImp(stack):
+        stack1 = []
+        stack2 = []
+        stack3 = []
+        stack4 = []  
+        width = cv.GetSize(stack[0])[0] / 2
+        height = cv.GetSize(stack[0])[1] / 2 
+        for image in stack: 
+            result1 = cv.CreateImage((width, height), 8, 1)
+            result2 = cv.CreateImage((width, height), 8, 1)
+            result3 = cv.CreateImage((width, height), 8, 1)
+            result4 = cv.CreateImage((width, height), 8, 1)
+            for i in xrange(0, height):
+                for j in xrange(0, width):
+                    result1[i, j] = image[i, j]
+                    result2[i, j] = image[i, j + result1.width]
+                    result3[i, j] = image[i + result1.height, j]
+                    result4[i, j] = image[i + result1.height, j + result1.width]
+            stack1.append(result1)
+            stack2.append(result2)
+            stack3.append(result3)
+            stack4.append(result4)
+        return (stack1, stack2, stack3, stack4)
+    buildPartialStacks = staticmethod(buildPartialStacksImp)   
+    
+    def findHoughMaxImp(stack):
+        max = 0
+        resultImage = 0
+        for i in range(0, len(stack)):
+            storage = cv.CreateMemStorage(0)
+            lines = cv.HoughLines2(ImageProc.getCanny(stack[i]), storage, cv.CV_HOUGH_PROBABILISTIC, 1, pi / 180, 50, 75, 10) 
+            if (len(lines) > max):
+                max = len(lines)
+                resultImage = stack[i]                
+        if (type(resultImage) == type(0)):
+            return stack[len(stack) / 2]
+        else:                               
+            return resultImage
+    findHoughMax = staticmethod(findHoughMaxImp) 
+    
+    def appendPartialImagesImp(partialImages):
+        width = partialImages[0].width
+        height = partialImages[0].height
+        result = cv.CreateImage((width * 2, height * 2), 8, 1)
+        for i in xrange(0, height):
+            for j in xrange(0, width):
+                result[i, j] = partialImages[0][i, j]
+                result[i, j + width] = partialImages[1][i, j]
+                result[i + height, j] = partialImages[2][i, j]
+                result[i + height, j + width] = partialImages[3][i, j]
+        return result
+    appendPartialImages = staticmethod(appendPartialImagesImp)
             
             
             
