@@ -28,6 +28,7 @@ if __name__ == '__main__':
         resultImages.append(resultImage) 
         names.append(ind)       
     i = 0    
+    
     for resultImage in resultImages:
         ImageProc.displayImage(resultImage, str(names[i]))
         ImageProc.saveImage(resultImage, "binary" + str(i))
