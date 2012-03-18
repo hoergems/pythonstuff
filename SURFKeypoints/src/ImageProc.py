@@ -58,6 +58,11 @@ class ImageProc:
         return image 
     drawKeypoints = staticmethod(drawKeypointsImp)
     
+    def getLaplaceImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        cv.Laplace(image, result, 3)
+        return result
+    getLaplace = staticmethod(getLaplaceImp)
     
     # Draws the harris corners of a given cornerMap into an image
     def drawHarrisCornersImp(image, cornerMap):        
@@ -121,8 +126,8 @@ class ImageProc:
     getGaussian = staticmethod(getGaussianImp)
     
     def getBinaryImageImp(image, threshold):
-        for i in image.height:
-            for j in image.width:
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
                 if image[i, j] > threshold:
                     image[i, j] = 255
                 else:

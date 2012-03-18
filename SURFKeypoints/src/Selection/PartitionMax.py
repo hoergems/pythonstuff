@@ -21,8 +21,11 @@ if __name__ == '__main__':
     for partialStack in partialStacks[1]:
         partialResults.append(ImageProc.findHoughMax(partialStack))  
     i = 0
+    for partialResult in partialResults:
+        partialCannyResults.append(ImageProc.getCanny(partialResult)) 
     resultImage = ImageProc.appendPartialImages(partialResults)
-    cannyResultImage = ImageProc.getCanny(resultImage)
-    ImageProc.displayImage(resultImage, "res")
+    cannyResultImage = ImageProc.appendPartialImages(partialCannyResults)
+    ImageProc.displayImage(cannyResultImage, "res")
+    ImageProc.displayImage(resultImage, "res2")
         
         
