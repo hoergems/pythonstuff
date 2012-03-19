@@ -11,13 +11,14 @@ from ImageProc import ImageProc
 import cv
 import os
 if __name__ == '__main__':  
-    images = ImageProc.getGrayscaleImages(ImageProc.readFiles("../stack/"))
+    images = ImageProc.getGrayscaleImages(ImageProc.readFiles("../Bilder/"))
     resultImages = []
     nextImages = []
-    stack1 = images[0:70]
-    stack2 = images[71:85]
-    stack3 = images[86:108] 
-    intervalls = [stack1, stack2, stack3]
+    stack1 = images[0:31]
+    stack2 = images[59:65]
+    stack3 = images[80:85]
+    stack4 = images[92:102] 
+    intervalls = [stack1, stack2, stack3, stack4]
     lines = []
     ind = 0
     for stack in intervalls:

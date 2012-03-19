@@ -61,6 +61,7 @@ class ImageProc:
     def getLaplaceImp(image):
         result = cv.CreateImage(cv.GetSize(image), 8, 1)
         cv.Laplace(image, result, 3)
+        print result
         return result
     getLaplace = staticmethod(getLaplaceImp)
     
@@ -213,7 +214,7 @@ class ImageProc:
     def buildPartialStacksImp(stack):
         stack1 = []
         stack2 = []
-        stack3 = []
+        stack3 = [] 
         stack4 = []  
         width = cv.GetSize(stack[0])[0] / 2
         height = cv.GetSize(stack[0])[1] / 2 
