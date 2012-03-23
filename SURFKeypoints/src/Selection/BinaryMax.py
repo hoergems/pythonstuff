@@ -10,6 +10,7 @@ import os
 if __name__ == '__main__':    
     images = ImageProc.getGrayscaleImages(ImageProc.readFiles("../Bilder/"))
     resultImages = []
+    cannyResultImages = []
     stack1 = images[0:31]
     stack2 = images[59:65]
     stack3 = images[80:85]
@@ -18,20 +19,18 @@ if __name__ == '__main__':
     names = []
     for stack in intervalls:
         count = 0  
-        resultImage = 0 
-        ind = 0
-        for i in range(0, len(stack)):            
-            newCount = ImageProc.countWhitePixels(stack[i], 70)
+        resultImage = 0
+        cannyResultImage = 0         
+        for image in stack:            
+            newCount = ImageProc.countWhitePixels(image, 70)
             if (newCount > count):
                 count = newCount
-                resultImage = stack[i]
-                ind = i
+                resultImage = (image, count)
+                cannyResultImage = (ImageProc.getCanny(image), count)                
         resultImages.append(resultImage) 
-        names.append(ind)       
-    i = 0    
-    
-    for resultImage in resultImages:
-        ImageProc.displayImage(resultImage, str(names[i]))
-        ImageProc.saveImage(resultImage, "binary" + str(i))
-        i += 1
+        cannyResultImages.append(cannyResultImage) 
+    for (image, count) in resultImages:        
+        ImageProc.saveImage(image, "binaryMax" + str(count))
+    for (image, count) in cannyResultImages:
+        ImageProc.saveImage(image, "binaryMaxCanny" + str(count))                                
         

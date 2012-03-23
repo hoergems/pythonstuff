@@ -28,5 +28,7 @@ if __name__ == '__main__':
            
     cannyResultImage = ImageProc.appendPartialImages(partialCannyResults)
     ImageProc.displayImage(resultImage, "res!")
+    ImageProc.saveImage(resultImage, "partitionRes")
     ImageProc.displayImage(cannyResultImage, "res")
+    ImageProc.saveImage(cannyResultImage, "partitionCannyRes")
     

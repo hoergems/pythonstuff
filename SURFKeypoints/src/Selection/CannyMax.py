@@ -12,7 +12,7 @@ if __name__ == '__main__':
     images = ImageProc.getGrayscaleImages(ImageProc.readFiles("../Bilder/"))
     cannyImages = ImageProc.getCanny(images)
     resultImages = []
-    cannyResultImages = []
+    resultCannyImages = []
     stack1 = images[0:31]
     stack2 = images[59:65]
     stack3 = images[80:85]
@@ -20,23 +20,24 @@ if __name__ == '__main__':
     intervalls = [stack1, stack2, stack3, stack4]
     index = 0
     for stack in intervalls:
-        resultImage = 0
-        resultCannyImage = 0
+        resultImage = (stack[0], 0)
+        resultCannyImage = 0        
         count = 0
         for image in stack:
             canny = ImageProc.getCanny(image)
-            newCount = ImageProc.countWhitePixels(canny, 50)
+            newCount = ImageProc.countWhiteCannyPixels(canny)            
             if (newCount > count):
-                resultImage = image
-                resultCannyImage = canny
-        resultImages.append(resultImage)
-        cannyResultImages.append(resultCannyImage)   
-    i = 0         
-    for resultImage in resultImages:
-        ImageProc.displayImage(resultImage, str(i))
-        ImageProc.displayImage(cannyResultImages[i], "canny")
-        ImageProc.saveImage(resultImage, "canny" + str(i))
-        i += 1
+                resultImage = (image, newCount) 
+                resultCannyImage = (canny, newCount)
+                count = newCount               
+        resultImages.append(resultImage) 
+        resultCannyImages.append(resultCannyImage)          
+    for (image, count) in resultImages:             
+        ImageProc.saveImage(image, "result" + str(count))
+    for (canny, count) in resultCannyImages:
+        ImageProc.saveImage(canny, "canny" + str(count))
+    
+        
     
             
             

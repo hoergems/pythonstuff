@@ -145,6 +145,15 @@ class ImageProc:
         return count
     countWhitePixels = staticmethod(countWhitePixelsImp)
     
+    def countWhiteCannyPixelsImp(image):
+        count = 0
+        for i in xrange(image.height):
+            for j in xrange(image.width):
+                if image[i, j] > 100:
+                    count += 1
+        return count
+    countWhiteCannyPixels = staticmethod(countWhiteCannyPixelsImp)
+    
     def transformImp(image):
         result = cv.CreateImage(cv.GetSize(image), 8, 1)
         (min, max) = ImageProc.findMinMax(image)
