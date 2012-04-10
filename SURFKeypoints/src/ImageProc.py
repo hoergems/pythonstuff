@@ -127,14 +127,87 @@ class ImageProc:
     getGaussian = staticmethod(getGaussianImp)
     
     def getBinaryImageImp(image, threshold):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
         for i in xrange(0, image.height):
             for j in xrange(0, image.width):
                 if image[i, j] > threshold:
-                    image[i, j] = 255
+                    result[i, j] = 255
                 else:
-                    image[i, j] = 0
-        return image
+                    result[i, j] = 0
+        return result
     getBinaryImage = staticmethod(getBinaryImageImp)
+    
+    def erosionImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                result[i, j] = 0
+        for i in xrange(1, image.height - 1):
+            for j in xrange(1, image.width - 1):
+                bool = True
+                for m in xrange(-1, 2):
+                    for n in xrange(-1, 2):
+                        if (image[i + m, j + n] == 0):
+                            bool = False
+                if (bool == True):
+                    result[i, j] = 255
+                else:
+                    result[i, j] = 0
+        return result           
+    erosion = staticmethod(erosionImp)
+    
+    def getBorderImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                result[i, j] = 0
+        for i in xrange(1, image.height - 1):
+            for j in xrange(1, image.width - 1): 
+                if (image[i, j] == 255):
+                    for k in xrange(-1, 2):
+                        for l in xrange(-1, 2):
+                            if (image[i + k, j + l] == 0):
+                                result[i, j] = 255 
+        return result             
+    getBorder = staticmethod(getBorderImp)
+    
+    def distanceTransformationImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                result[i, j] = 0
+        for r in xrange(0, 20):
+            border = ImageProc.getBorder(image)
+            for i in xrange(0, image.height):
+                for j in xrange(0, image.width):
+                    if (border[i, j] == 255):
+                        #result[i, j] = r*25 < 256 and result[i, j] + r*25 or 255
+                        result[i, j] = r*10
+                        image[i, j] = 0
+        return ImageProc.transform(result)                   
+    distanceTransformation = staticmethod(distanceTransformationImp)
+    
+    def valueBetweenThresholdsImp(image, lower, upper):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                if (lower < image[i, j] < upper):
+                    result[i, j] = 255
+                else:
+                    result[i, j] = 0
+        return result                                  
+    valueBetweenThresholds = staticmethod(valueBetweenThresholdsImp)
+    
+    def xorImp(image, erodedImage):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                if (image[i, j] == erodedImage[i, j]):
+                    result[i, j] = 0
+                else:
+                    result[i, j] = 255
+        return result
+    xor = staticmethod(xorImp)
     
     def countWhitePixelsImp(image, threshold):
         count = 0
@@ -157,9 +230,9 @@ class ImageProc:
     def transformImp(image):
         result = cv.CreateImage(cv.GetSize(image), 8, 1)
         (min, max) = ImageProc.findMinMax(image)
-        for i in range(0, image.height):
-            for j in range(0, image.width):
-                p = (255.0 / float(max-min)) * image[i, j] - (255.0 / (max-min)) * min
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                p = (255.0 / float(max-min)) * image[i, j] - (255.0 / float(max-min)) * min 
                 p = int(p)                
                 result[i, j] = p
         return result            
@@ -217,7 +290,7 @@ class ImageProc:
     findMinMax = staticmethod(findMinMaxImp)  
     
     def saveImageImp(image, filename):
-        cv.SaveImage(filename + ".jpg", image)
+        cv.SaveImage(filename + ".bmp", image)
     saveImage = staticmethod(saveImageImp) 
     
     def buildPartialStacksImp(stack):
