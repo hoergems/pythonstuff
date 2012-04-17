@@ -1,0 +1,60 @@
+\ProvidesPackage{sedocs}
+\NeedsTeXFormat{LaTeX2e}
+
+\usepackage{ifthen}
+\usepackage{setspace}
+
+\newboolean{isinlist}
+
+\newcommand{\classheading}[1]{\subsection{#1}}
+\newcommand{\classlabelling}{Klasse}
+
+\newcommand{\writeinlist}[1]
+	{\ifthenelse{\boolean{isinlist}}{}{\begin{itemize} \setboolean{isinlist}{true}} \item[] #1}
+
+\newcommand{\writeplain}[1]
+	{\ifthenelse{\boolean{isinlist}}{\end{itemize} \setboolean{isinlist}{false}}{\ \\[5pt]} #1}
+
+
+\newenvironment{classdef}[1]{\classheading{\classlabelling\texttt{\ #1}}\setboolean{isinlist}{false} \renewcommand{\labelitemi}{\ }}
+		{\ifthenelse{\boolean{isinlist}}{\end{itemize}}{\ \\[5pt]}\rule{\textwidth}{1pt}}
+
+\newcommand{\methoddef}[2]{\writeinlist{\texttt{#1}} \begin{list}{} {\setlength{\leftmargin}{1cm}} \item #2 \end{list}}
+\newcommand{\vardef}[2]{\methoddef{#1}{#2}}
+
+\newcommand{\classdesc}[1]{\writeplain{#1}}
+
+%title stuff
+\def\gettitle{\relax}
+\renewcommand{\title}[1]{\gdef\gettitle{#1}}
+\def\getlogo{\relax}
+\newcommand{\logo}[1]{\gdef\getlogo{#1}}
+\def\getcreated{\relax}
+\newcommand{\created}[1]{\gdef\getcreated{#1}}
+\def\getlastchange{\relax}
+\newcommand{\lastchange}[1]{\gdef\getlastchange{#1}}
+\def\getversion{\relax}
+\newcommand{\version}[1]{\gdef\getversion{#1}}
+\def\getauthor{\relax}
+\renewcommand{\author}[1]{\gdef\getauthor{#1}}
+
+\renewcommand{\maketitle}{
+\begin{titlepage}
+	\begin{center}
+	\vspace*{\fill}
+		\setstretch{3.0}
+		\begin{Huge}\textbf{\textsf{\gettitle}}\end{Huge}\\
+		\setstretch{1.0} 
+		\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip
+		\getlogo \\
+		\bigskip\bigskip\bigskip\bigskip
+		\textsf{\textbf{\begin{LARGE}Version \getversion \end{LARGE}}}\\
+		\bigskip
+		\getauthor
+		\bigskip \\
+	\textbf{erstellt am:} \getcreated \\
+	\textbf{letzte Änderung:} \getlastchange
+	\vspace*{\fill}
+	\end{center}
+	\end{titlepage}
+}
