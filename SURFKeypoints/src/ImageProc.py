@@ -227,6 +227,35 @@ class ImageProc:
         return count
     countWhiteCannyPixels = staticmethod(countWhiteCannyPixelsImp)
     
+    def templateMatchingImp(image, template):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(30, image.height - 30):
+            for j in xrange(30, image.width - 30):
+                mad = 0
+                for k in xrange(-30, 30):
+                    for l in xrange(-30, 30):
+                        mad = mad + math.fabs(image[i + k, j + l] - template[24 + k, 18 + l])
+                mad = mad / (30 * 30)
+                result[i, j] = mad                
+        return result                
+    templateMatching = staticmethod(templateMatchingImp)
+    
+    def invertImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                result[i, j] = ((127.5 - image[i, j]) + 127.5)
+        return result;
+    invert = staticmethod(invertImp)
+    
+    def brightenImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
+                result[i, j] = image[i, j] * 2
+        return result
+    brighten = staticmethod(brightenImp)
+    
     def transformImp(image):
         result = cv.CreateImage(cv.GetSize(image), 8, 1)
         (min, max) = ImageProc.findMinMax(image)
