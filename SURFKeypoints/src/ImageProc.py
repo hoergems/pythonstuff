@@ -11,6 +11,7 @@ import collections
 from Filter import Filter
 from SURF import SURF
 from Loetstellen import Loetstellen
+import sys
 
 class ImageProc:
     
@@ -255,6 +256,80 @@ class ImageProc:
                 result[i, j] = image[i, j] * 2
         return result
     brighten = staticmethod(brightenImp)
+    
+    def countLocalMinimaImp(image):
+        result = cv.CreateImage(cv.GetSize(image), 8, 1)
+        for j in xrange(0, image.height):
+            for i in xrange(0, image.width):
+                dist = 200  
+                m = i
+                n = j
+                while dist > 3:                                  
+                    searchImage = ImageProc.extractPartialImage(image, m, n) 
+                    if i == 200 and j == 200:
+                        print 'hellO'                        
+                    try:                                       
+                        (k, l) = ImageProc.findLocalMinima(searchImage)
+                    except:
+                        print i, j
+                        print sys.exc_info()[0]
+                        print searchImage
+                        sys.exit()
+                    dist = ImageProc.euklidianDistance((m, n), (k, l))                    
+                    (m, n) = (k, l)
+                result[m, n] = result[m, n] + 1
+        return result;
+    countLocalMinima = staticmethod(countLocalMinimaImp)
+    
+    def findLocalMinimaImp(image):
+        min = 255
+        pos = 0
+        for j in xrange(y1, y2):
+            for i in xrange(x1 , x2):
+                dele = image[j, i]
+                if dele <= min:
+                    min = image[j, i]
+                    pos = (i, j)
+        return pos
+    findLocalMinima = staticmethod(findLocalMinimaImp)
+    
+    def extractPartialImageImp(image, i, j):
+        x1 = 5
+        x2 = 5
+        y1 = 5
+        y2 = 5
+        if i < 5:
+            x1 = i
+        if ((image.width - i) < 5):
+            x2 = image.width - i
+        if j < 5:
+            y1 = j
+        if ((image.height - j) < 5):
+            y2 = image.height - j
+        result = cv.CreateImage((x1 + x2, y1 + y2), 8, 1)        
+        n = 0        
+        for l in xrange(-1*y1, y2):
+            m = 0
+            for k in xrange(-1*x1, x2):                
+                result[n, m] = 0
+                try:               
+                    result[n, m] = image[j + l, i + k]
+                except:   
+                    print image
+                    print result 
+                    print x1, x2
+                    print y1, y2           
+                    print i, j, k, l
+                    print m, n
+                    sys.exit()                  
+                m = m + 1
+            n = n + 1
+        return result            
+    extractPartialImage = staticmethod(extractPartialImageImp)
+    
+    def euklidianDistanceImp((x1, y1), (x2, y2)):
+        return math.sqrt(math.fabs(x2 - x1)**2 + math.fabs(y2 - y1)**2)
+    euklidianDistance = staticmethod(euklidianDistanceImp)
     
     def transformImp(image):
         result = cv.CreateImage(cv.GetSize(image), 8, 1)
