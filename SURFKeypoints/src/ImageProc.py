@@ -259,8 +259,8 @@ class ImageProc:
     
     def countLocalMinimaImp(image):
         result = cv.CreateImage(cv.GetSize(image), 8, 1)
-        for j in xrange(0, image.height):
-            for i in xrange(0, image.width):
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):
                 dist = 200  
                 m = i
                 n = j
@@ -270,25 +270,34 @@ class ImageProc:
                         print 'hellO'                        
                     try:                                       
                         (k, l) = ImageProc.findLocalMinima(searchImage)
+                        posY = 0
+                        posX = 0
+                        if k <= (searchImage.height / 2):
+                            posY = m - k
+                        else:
+                            posY = m + k
+                        if l <= (searchImage.width / 2):
+                            posX = n - l
+                        else:
+                            posX = n + 1
                     except:
                         print i, j
                         print sys.exc_info()[0]
                         print searchImage
                         sys.exit()
-                    dist = ImageProc.euklidianDistance((m, n), (k, l))                    
-                    (m, n) = (k, l)
-                result[m, n] = result[m, n] + 1
+                    dist = ImageProc.euklidianDistance((n, m), (posY, posX))                    
+                    (n, m) = (posY, posX)
+                result[n, m] = result[n, m] + 1
         return result;
     countLocalMinima = staticmethod(countLocalMinimaImp)
     
     def findLocalMinimaImp(image):
         min = 255
         pos = 0
-        for j in xrange(y1, y2):
-            for i in xrange(x1 , x2):
-                dele = image[j, i]
-                if dele <= min:
-                    min = image[j, i]
+        for i in xrange(0, image.height):
+            for j in xrange(0, image.width):                
+                if image[i, j] <= min:
+                    min = image[i, j]
                     pos = (i, j)
         return pos
     findLocalMinima = staticmethod(findLocalMinimaImp)
@@ -298,22 +307,22 @@ class ImageProc:
         x2 = 5
         y1 = 5
         y2 = 5
-        if i < 5:
-            x1 = i
-        if ((image.width - i) < 5):
-            x2 = image.width - i
         if j < 5:
-            y1 = j
-        if ((image.height - j) < 5):
-            y2 = image.height - j
+            x1 = j
+        if ((image.width - j) < 5):
+            x2 = image.width - j
+        if i < 5:
+            y1 = i
+        if ((image.height - i) < 5):
+            y2 = image.height - i
         result = cv.CreateImage((x1 + x2, y1 + y2), 8, 1)        
-        n = 0        
-        for l in xrange(-1*y1, y2):
-            m = 0
-            for k in xrange(-1*x1, x2):                
-                result[n, m] = 0
+        m = 0        
+        for k in xrange(-1*y1, y2):
+            n = 0
+            for l in xrange(-1*x1, x2):                
+                result[m, n] = 0
                 try:               
-                    result[n, m] = image[j + l, i + k]
+                    result[m, n] = image[i + k, j + l]
                 except:   
                     print image
                     print result 
@@ -322,12 +331,12 @@ class ImageProc:
                     print i, j, k, l
                     print m, n
                     sys.exit()                  
-                m = m + 1
-            n = n + 1
+                n = n + 1
+            m = m + 1
         return result            
     extractPartialImage = staticmethod(extractPartialImageImp)
     
-    def euklidianDistanceImp((x1, y1), (x2, y2)):
+    def euklidianDistanceImp((y1, x1), (y2, x2)):
         return math.sqrt(math.fabs(x2 - x1)**2 + math.fabs(y2 - y1)**2)
     euklidianDistance = staticmethod(euklidianDistanceImp)
     
